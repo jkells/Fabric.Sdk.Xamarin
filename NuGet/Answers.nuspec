@@ -29,10 +29,5 @@
     <file src="Sources/AnswersKit.Droid/bin/Release/AnswersKit.Platform.dll"
           target="lib/MonoAndroid10/AnswersKit.Platform.dll" />
 
-    <!-- Xamarin.iOS -->
-    <file src="Sources/AnswersKit/bin/Release/AnswersKit.dll"
-          target="lib/Xamarin.iOS10/AnswersKit.dll" />
-    <file src="Sources/AnswersKit.Touch/bin/Release/AnswersKit.Platform.dll"
-          target="lib/Xamarin.iOS10/AnswersKit.Platform.dll" />
   </files>
 </package>

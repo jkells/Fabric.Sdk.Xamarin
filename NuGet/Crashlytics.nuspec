@@ -35,14 +35,6 @@
     <file src="Sources/CrashlyticsKit.Droid/bin/Release/CrashlyticsKit.Platform.dll"
           target="lib/MonoAndroid10/CrashlyticsKit.Platform.dll" />
 
-    <!-- Xamarin.iOS -->
-    <file src="Sources/AnswersKit/bin/Release/AnswersKit.dll"
-          target="lib/Xamarin.iOS10/AnswersKit.dll" />
-    <file src="Sources/CrashlyticsKit.Answers.Touch/bin/Release/AnswersKit.Platform.dll"
-          target="lib/Xamarin.iOS10/AnswersKit.Platform.dll" />
-    <file src="Sources/CrashlyticsKit/bin/Release/CrashlyticsKit.dll"
-          target="lib/Xamarin.iOS10/CrashlyticsKit.dll" />
-    <file src="Sources/CrashlyticsKit.Touch/bin/Release/CrashlyticsKit.Platform.dll"
-          target="lib/Xamarin.iOS10/CrashlyticsKit.Platform.dll" />
+
   </files>
 </package>
