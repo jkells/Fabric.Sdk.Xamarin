@@ -3,7 +3,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
     <id>Crashlytics</id>
-    <version>1.0.1000</version>
+    <version>1.0.1001</version>
     <title>Crashlytics</title>
     <authors>Michel Moreira</authors>
     <projectUrl>https://github.com/drungrin/Fabric.Sdk.Xamarin</projectUrl>
