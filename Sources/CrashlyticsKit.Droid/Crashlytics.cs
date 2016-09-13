@@ -14,7 +14,7 @@ namespace CrashlyticsKit
     public class Crashlytics : Kit, ICrashlytics
     {
         private static readonly Lazy<Crashlytics> LazyInstance = new Lazy<Crashlytics>(() => new Crashlytics());
-        private static readonly Regex StackTraceRegex = new Regex(@"\s*at\s*(\S+)\.(\S+\(?.*\)?)\s\[0x[\d\w]+\]\sin\s.+[\\/>](.*):(\d+)?");
+        private static readonly Regex StackTraceRegex = new Regex(@"\s*at (?<ClassName>\S*)\.(?<MethodName>\S*) (?<MethodArguments>\(.*?\)) (?<Offset>.*?) in (?<Filename>.*?):(?<LineNumber>\d*)\s*");
 
         private Crashlytics() : base(new Bindings.CrashlyticsKit.Crashlytics())
         {
@@ -114,19 +114,21 @@ namespace CrashlyticsKit
 
             var stackTrace = new List<StackTraceElement>();
             foreach (Match match in StackTraceRegex.Matches(exception.StackTrace))
-            {
-                var cls = match.Groups[1].Value;
-                var method = match.Groups[2].Value;
-                var file = match.Groups[3].Value;
-                var line = Convert.ToInt32(match.Groups[4].Value);
-                if (!cls.StartsWith("System.Runtime.ExceptionServices") &&
-                    !cls.StartsWith("System.Runtime.CompilerServices"))
-                {
-                    if (String.IsNullOrEmpty(file))
-                        file = "filename unknown";
+            {                
+                var cls = match.Groups["ClassName"].Value;
+                var method = match.Groups["MethodName"].Value;
+                var methodArgs = match.Groups["MethodArguments"].Value;
+                var file = match.Groups["Filename"].Value;
 
-                    stackTrace.Add(new StackTraceElement(cls, method, file, line));
-                }
+
+                int line;
+                if (!int.TryParse(match.Groups["LineNumber"].Value, out line))
+                    line = 0;
+                
+                if (String.IsNullOrEmpty(file))
+                    file = "filename unknown";
+
+                stackTrace.Add(new StackTraceElement(cls, method + methodArgs, file, line));
             }
             throwable.SetStackTrace(stackTrace.ToArray());
 
