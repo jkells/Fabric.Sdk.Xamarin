@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Android.Content;
@@ -14,7 +15,7 @@ namespace CrashlyticsKit
     public class Crashlytics : Kit, ICrashlytics
     {
         private static readonly Lazy<Crashlytics> LazyInstance = new Lazy<Crashlytics>(() => new Crashlytics());
-        private static readonly Regex StackTraceRegex = new Regex(@"\s*at (?<ClassName>\S*)\.(?<MethodName>\S*) (?<MethodArguments>\(.*?\)) (?<Offset>.*?) in (?<Filename>.*?):(?<LineNumber>\d*)\s*");
+        private static readonly Regex StackTraceRegex = new Regex(@"\s*at (?<ClassName>\S*)\.(?<MethodName>\S*) (?<MethodArguments>\(.*?\)) <?(?<Offset>.*?)>? in (?<Filename>.*?):(?<LineNumber>\d*)\s*");
 
         private Crashlytics() : base(new Bindings.CrashlyticsKit.Crashlytics())
         {
@@ -110,7 +111,8 @@ namespace CrashlyticsKit
                 return throwable;
             }
 
-            throwable = new Throwable(exception.Message);
+            var exceptionMessage = $"{exception.GetType().FullName}: {exception.Message}";
+            throwable = new Throwable(exceptionMessage);
 
             var stackTrace = new List<StackTraceElement>();
             foreach (Match match in StackTraceRegex.Matches(exception.StackTrace))
@@ -119,15 +121,25 @@ namespace CrashlyticsKit
                 var method = match.Groups["MethodName"].Value;
                 var methodArgs = match.Groups["MethodArguments"].Value;
                 var file = match.Groups["Filename"].Value;
+                var offset = match.Groups["Offset"].Value;
 
-
+                // -2 is Java standard for native crash without line number
                 int line;
-                if (!int.TryParse(match.Groups["LineNumber"].Value, out line))
-                    line = 0;
+                if (int.TryParse(match.Groups["LineNumber"].Value, out line))
+                {
+                    if (line == 0)
+                        line = -2;
+                }
+                else
+                    line = -2;                 
                 
-                if (String.IsNullOrEmpty(file))
-                    file = "filename unknown";
+                offset = offset.Split('+', ' ').LastOrDefault() ?? "";
 
+                // Filename is important to Crashlytics. Without it the crashes
+                // aggregate together.
+                if (String.IsNullOrEmpty(file) || file.Equals("<filename unknown>"))
+                    file = $"{cls}.{method}.{offset}.cs";
+                
                 stackTrace.Add(new StackTraceElement(cls, method + methodArgs, file, line));
             }
             throwable.SetStackTrace(stackTrace.ToArray());
