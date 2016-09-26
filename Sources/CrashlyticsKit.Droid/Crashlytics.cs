@@ -137,8 +137,7 @@ namespace CrashlyticsKit
 
                 // Filename is important to Crashlytics. Without it the crashes
                 // aggregate together.
-                if (String.IsNullOrEmpty(file) || file.Equals("<filename unknown>"))
-                    file = $"{cls}.{method}.{offset}.cs";
+                file = $"{cls}.{method}.{offset}.cs";
                 
                 stackTrace.Add(new StackTraceElement(cls, method + methodArgs, file, line));
             }
